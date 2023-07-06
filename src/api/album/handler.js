@@ -72,6 +72,65 @@ class AlbumHandler {
     response.code(201);
     return response;
   }
+
+  async postLikesByAlbumIdHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+    let message = '';
+
+    // cek apakah terdapat album yang akan dilike
+    await this._service.getAlbumById(albumId);
+
+    // cek pengguna apakah sudah like album
+    const isAlbumAlreadyLiked = await this._service.isAlbumAlreadyLiked(albumId, credentialId);
+
+    if (isAlbumAlreadyLiked) {
+      await this._service.removeLikesByAlbumId(albumId, credentialId);
+      message = 'Album berhasil di unlike';
+    } else {
+      await this._service.addLikesByAlbumId(albumId, credentialId);
+      message = 'Album berhasil di like';
+    }
+    const response = h.response({
+      status: 'success',
+      message,
+    });
+    response.code(201);
+    return response;
+  }
+
+  async getLikesByAlbumIdHandler(request, h) {
+    const { id: albumId } = request.params;
+
+    // cek apakah terdapat album yang akan dilihat jumlah likes
+    await this._service.getAlbumById(albumId);
+
+    // cek auth utk cek pengguna udah like album apa belum
+    const { likes, source } = await this._service.countLikesByAlbumId(albumId);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        likes,
+      },
+    });
+
+    if (source === 'cache') {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
+  }
+
+  async deleteLikesByAlbumIdHandler(request) {
+    const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._service.removeLikesByAlbumId(id, credentialId);
+    return {
+      status: 'success',
+      message: 'Album berhasil di unlike',
+    };
+  }
 }
 
 module.exports = AlbumHandler;

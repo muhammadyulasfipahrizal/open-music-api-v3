@@ -13,6 +13,7 @@ const album = require('./api/album');
 const AlbumValidator = require('./validator/album');
 const AlbumService = require('./services/postgres/AlbumService');
 const StorageService = require('./services/storage/StorageService');
+const CacheService = require('./services/redis/CacheService');
 
 // song api
 const songs = require('./api/song');
@@ -47,7 +48,8 @@ const ExportsValidator = require('./validator/exports');
 
 const init = async () => {
   const storageService = new StorageService(path.resolve(__dirname, 'api/album/file/covers'));
-  const albumService = new AlbumService();
+  const cacheService = new CacheService();
+  const albumService = new AlbumService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
