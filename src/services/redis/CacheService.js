@@ -1,10 +1,12 @@
+/* eslint-disable no-console */
 const redis = require('redis');
+const config = require('../../utils/config');
 
 class CacheService {
   constructor() {
     this._client = redis.createClient({
       socket: {
-        host: process.env.REDIS_SERVER,
+        host: config.redis.host,
       },
     });
     this._client.on('error', (error) => {
