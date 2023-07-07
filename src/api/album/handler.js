@@ -78,10 +78,8 @@ class AlbumHandler {
     const { id: credentialId } = request.auth.credentials;
     let message = '';
 
-    // cek apakah terdapat album yang akan dilike
     await this._service.getAlbumById(albumId);
 
-    // cek pengguna apakah sudah like album
     const isAlbumAlreadyLiked = await this._service.isAlbumAlreadyLiked(albumId, credentialId);
 
     if (isAlbumAlreadyLiked) {
@@ -102,10 +100,8 @@ class AlbumHandler {
   async getLikesByAlbumIdHandler(request, h) {
     const { id: albumId } = request.params;
 
-    // cek apakah terdapat album yang akan dilihat jumlah likes
     await this._service.getAlbumById(albumId);
 
-    // cek auth utk cek pengguna udah like album apa belum
     const { likes, source } = await this._service.countLikesByAlbumId(albumId);
 
     const response = h.response({
